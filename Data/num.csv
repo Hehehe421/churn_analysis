@@ -1,0 +1,5 @@
+Name,Missing,Min,Q1,Mean,Median,Q3,Max
+SeniorCitizen,0,0,0,0.16,0,0,1
+tenure,0,0,9,32.37,29,55,72
+MonthlyCharges,0,18.25,35.5,64.76,70.35,89.85,118.75
+TotalCharges,11,18.8,401.4,2283.3,1397.5,3794.7,8684.8

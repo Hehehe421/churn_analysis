@@ -1,0 +1,9 @@
+Name,Missing,Unique,Name,Missing,Unique
+customerID*,0,7043,OnlineBackup*,0,3
+gender*,0,2,DeviceProtection*,0,3
+Partner*,0,2,TechSupport*,0,3
+Dependents*,0,2,StreamingTV*,0,3
+PhoneService*,0,2,StreamingMovies*,0,3
+MultipleLines*,0,3,Contract*,0,3
+InternetService*,0,3,PaperlessBilling*,0,2
+OnlineSecurity*,0,3,PaymentMethod*,0,4
