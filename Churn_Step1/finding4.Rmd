@@ -1,0 +1,8 @@
+
+### Convert Numerical Variables into Categorical: 
+- Grouped the tenure by **year** into **6** group: 
+  + tenure_1yr < tenure_2yr < tenure_3yr < tenure_4yr < tenure_5yr < tenure_6yr. 
+- Grouped the MonthlyCharges value by **quantile**: 
+  + monthly_Q1 < monthly_Q2 < monthly_Q3 < monthly_Q4.
+- Grouped the TotalCharge value by **quantile**: 
+  + total_Q1 < total_Q2 < total_Q3 < total_Q4

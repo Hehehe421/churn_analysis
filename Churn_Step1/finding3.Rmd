@@ -1,0 +1,16 @@
+
+### Findings: 
+- There is a significant difference in **tenure** between Churned and Non-Churned cusomter, people who stayed longer in the plan may have a lower tendency to Churn. Which aling with the customer who has 2 years contract has the lower chance to Churn. 
+- Customer who has a **higer Monthly Charges** are **more likely** to Churn, this is easy to understand that price is always one important factor to affect people's behavior.
+- Contrary to Monthly Charges, people who churned actually has a **lower total charges** overall. This might because those people **stopped fast** after they joined the plan.  
+
+### Next Steps:
+- Bucket the Numerical Variables into Categorical Variable
+- Look at the interactive affects on Churn/Non-Churned behavior
+- Try to find the higest risk cluster of customer to Churn
+
+
+
+
+
+

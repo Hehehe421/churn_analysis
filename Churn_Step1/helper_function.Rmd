@@ -1,0 +1,166 @@
+```{r}
+tweaks <- 
+  list(tags$head(tags$style(HTML("
+                                 .multicol { 
+                                 height: 150px;
+                                 -webkit-column-count: 3; /* Chrome, Safari, Opera */ 
+                                 -moz-column-count: 3;    /* Firefox */ 
+                                 column-count: 3; 
+                                 -moz-column-fill: auto;
+                                 -column-fill: auto;
+                                 } 
+                                 ")) 
+  ))
+
+
+num_choices = c('tenure', 'MonthlyCharges', 'TotalCharges')
+
+category_choices = c("gender","Partner" ,"Dependents","PhoneService", "MultipleLines" ,
+                     "InternetService","OnlineSecurity","OnlineBackup","DeviceProtection",
+                     "TechSupport","StreamingTV","StreamingMovies","Contract",
+                     "PaperlessBilling","PaymentMethod", "SeniorCitizen")
+
+category_selected <- c("Contract")
+num_selected <- c("tenure")
+churn = churn[, tenure_group := cut(tenure, breaks = 6, 
+                                 labels = c('tenure_1yr', 'tenure_2yr', 'tenure_3yr', 'tenure_4yr', 'tenure_5yr', 'tenure_6yr'))][
+                                   , monthly_group := cut(MonthlyCharges, 
+                                                          breaks=quantile(MonthlyCharges, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                                          include.lowest=TRUE, labels = c("Monthly_Q1", "Monthly_Q2", "Monthly_Q3", "Monthly_Q4"))
+                                   ][, total_group := cut(TotalCharges, 
+                                                          breaks=quantile(TotalCharges, probs=seq(0,1, by=0.25), na.rm=TRUE), 
+                                                          include.lowest=TRUE, labels = c("Total_Q1", "Total_Q2", "Total_Q3", "Total_Q4"))
+                                     
+                                     ]
+#my.data = churn[, .(Count = .N), by = c('tenure_group','Contract', 'Churn')]
+churn_num <- churn
+level1 <- c("Yes", "No","No internet service")
+churn_num$OnlineBackup <- as.integer(factor(churn_num$OnlineBackup, levels = level1))
+churn_num$OnlineSecurity <- as.integer(factor(churn_num$OnlineSecurity, levels = level1))
+churn_num$DeviceProtection <- as.integer(factor(churn_num$DeviceProtection, levels = level1))
+churn_num$TechSupport <- as.integer(factor(churn_num$TechSupport, levels = level1))
+churn_num$StreamingTV <- as.integer(factor(churn_num$StreamingTV, levels = level1))
+churn_num$StreamingMovies <- as.integer(factor(churn_num$StreamingMovies, levels = level1))
+
+level2 <- c ("Month-to-month", "One year", "Two year")
+churn_num$Contract <- as.integer(factor(churn_num$Contract, levels = level2))
+
+level3 <- c("Yes", "No")
+churn_num$Partner <- as.integer(factor(churn_num$Partner, levels = level3))
+churn_num$Dependents <- as.integer(factor(churn_num$Dependents, levels = level3))
+churn_num$PhoneService <- as.integer(factor(churn_num$PhoneService, levels = level3))
+churn_num$PaperlessBilling <- as.integer(factor(churn_num$PaperlessBilling, levels = level3))
+#churn_num$Churn <- as.integer(factor(churn_num$Churn, levels = level3))
+churn_num[,":="(Churn=ifelse(Churn=="No",0,1))]
+
+level4 <- c("Yes", "No", "No phone service")
+churn_num$MultipleLines <- as.integer(factor(churn_num$MultipleLines, levels = level4))
+
+level5 <- c( "Electronic check","Mailed check","Bank transfer (automatic)","Credit card (automatic)")
+churn_num$PaymentMethod <- as.integer(factor(churn_num$PaymentMethod, levels = level5))
+
+level6 <- c("Female", "Male")
+churn_num$gender <- as.integer(factor(churn_num$gender, levels = level6))
+
+level7 <- c("DSL", "Fiber optic", "No")
+churn_num$InternetService <- as.integer(factor(churn_num$InternetService, levels = level7))
+
+# mat : is a matrix of data
+# ... : further arguments to pass to the native R cor.test function
+cor.mtest <- function(mat, ...) {
+  mat <- as.matrix(mat)
+  n <- ncol(mat)
+  p.mat<- matrix(NA, n, n)
+  diag(p.mat) <- 0
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      tmp <- cor.test(mat[, i], mat[, j], ...)
+      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+    }
+  }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+
+layer1_choices = c(
+  "InternetService","StreamingTV","Contract",
+  "PaymentMethod","tenure_group", 
+  "monthly_group", "total_group")
+
+layer2_choices = c(
+  "InternetService","StreamingTV","Contract",
+  "PaymentMethod","tenure_group", 
+  "monthly_group", "total_group")
+layer1_selected = c('Contract')
+layer2_selected = c('tenure_group')
+
+plot_groupbar <- function(data, group1, group2, pos, title, xlable){
+  p = data %>% group_by(data[[group1]], data[[group2]]) %>%
+    summarise(count=n()) %>%
+    mutate(pct=count/sum(count))%>%
+    ggplot(aes(x=`data[[group2]]`, y=count, colour=`data[[group2]]`, fill=`data[[group2]]`)) +
+    geom_bar(stat="identity") +
+    facet_grid(.~`data[[group1]]`, labeller = as_labeller(c(`Yes`='Churned', `No` = 'Non-Churned'))) +
+    scale_y_continuous() + 
+    geom_text(aes(label=paste0(round(pct*100,1),"%"),
+                  y=count+pos), size=4) +
+    ggtitle(title) + xlab(xlable) +
+    theme_bw() + theme(legend.title = element_blank()) +
+    theme(
+      strip.background = element_rect(
+        color="black", fill="orange", size=1.5, linetype="solid"
+      ),
+      axis.text = element_text( size = 14 ),
+      axis.text.x = element_text( size = 14,angle = 45, hjust = 1),
+      axis.title = element_text( size = 16, face = "bold" ),
+      legend.position="none",
+      # The new stuff
+      strip.text = element_text(size = 20)
+    )
+  return (p)
+}
+
+plot_groupbox <- function(data, Churn, group2, title, xlable){
+  p = ggplot(data, aes_string(x=Churn, y=group2, fill = Churn)) +
+    geom_boxplot() +
+    facet_wrap(~Churn, scale="free",labeller = as_labeller(c(`Yes`='Churned', `No` = 'Non-Churned'))) +
+    #scale_y_continuous() + 
+    ggtitle(title) + xlab(xlable) +
+    theme_bw() + theme(legend.title = element_blank()) +
+    theme(
+      strip.background = element_rect(
+        color="black", fill="orange", size=1.5, linetype="solid"
+      ),
+      axis.text = element_text( size = 14 ),
+      axis.text.x = element_text( size = 14,angle = 45, hjust = 1),
+      axis.title = element_text( size = 16, face = "bold" ),
+      legend.position="none",
+      # The new stuff
+      strip.text = element_text(size = 20)
+    )
+  return (p)
+}
+
+plot_grouphist <- function(data, group1, title, xlable){
+  
+  p<-ggplot(data, aes_string(x=group1, color="Churn", fill="Churn")) +
+    geom_histogram(position="identity", alpha=0.7, bins = 30)+
+    ggtitle(title) + xlab(xlable) +
+    theme_bw() + theme(legend.title = element_blank()) +
+    theme(
+      strip.background = element_rect(
+        color="black", fill="orange", size=1.5, linetype="solid"
+      ),
+      axis.text = element_text( size = 14 ),
+      axis.text.x = element_text( size = 14,angle = 45, hjust = 1),
+      axis.title = element_text( size = 16, face = "bold" ),
+      legend.position="none",
+      # The new stuff
+      strip.text = element_text(size = 20)
+    )
+  return (p)
+}
+
+
+```
+

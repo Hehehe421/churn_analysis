@@ -1,0 +1,41 @@
+
+## Conclusion based on exploratory analysis
+#### The ratio of Churn = 'No'/ Churn = 'Yes' is **2.7**, there is no imbalance issue for the future modeling. Only 11 records contains missing values, removed them for the first step. The dataset is in high quality.
+
+
+#### Understand the features effects
+
+  + **Contract, tenure, TotalCharges and PaymentMethod** are positive correlated to Churn
+  + **SeniorCitizen** and **MonthlyCharges** are negative correlated to Churn 
+  + **InternetServie, OnlineSecurity, Techsupport, OnlineBackup, DeviceProtection, StreamingTV, StreamingMovies** are highly related with each other, there is a collinearity in this case
+  + **MonthlyCharges** and **TotalCharges** are highly **negative** related to **OnlineBackup, DeviceProtection, StreamingTV, StreamingMovies**, this is make sense to me, the more servies the higher charges.
+  
+#### Possible cluster of customer(before any modelings)
+  + **High Risk Customer**:Customer who has a **Month-to-month** contract and **tenure** is within one year has a high risk to Churn. 
+    - Especially for those cusotmer who has higer monthly charges but do not volunteer in any of services(InternetServie, OnlineSecurity, Techsupport, OnlineBackup, DeviceProtection, StreamingTV, StreamingMovies)
+    - For those relative 'high risk' customer, conduct a online marketing campaign to **offer a slightly lower price or other benefit to see whether can change their contract into a longer stage to reduce the risk to Churn.**
+    
+  + **Low Risk Customer**:Customer who has a **Two year** contract and **tenure** is more than 3 years has a low risk to Churn.
+    - Especially for those customer who has **'No internet service'** for most of services, which means they are kind of **'lazy'** and do not want to exposure to the Internet.
+    - Here, we just can conclude that less exposure to Internet for these customer is less likely to Churn. **However, what will happen if we keep sending them emails(like coupons/advertisements)? Whether they will be happy or not? If they have a negative attitude to more campaign emails, we'd better leave them out. This can also reduce the cost for the organization. More data need to evluate the assumptions.**
+    
+#### Proposed KPI(s) for tracking
+
+  
+  + High level KPI(s):
+    - TotalRevenue = **Sum(TotalCharges)**
+    - RatioNon-risk = **Sum(Non-risk Charges)/TotalRevenue**
+        + (where Non-risk Charges can be defined as total charges sum from **"one year"** and **"two year"** contract customers)
+    - The **higher** of both KPIs the **better**!! 
+  + Customer level KPI(s):
+    - RiskScore = **MonthlyCharges/Average(MonthlyCharges) * Number of services**
+        + (where Average(MonthlyCharges) can be calculated by contract group and the services can be any of **InternetServie, OnlineSecurity, Techsupport, OnlineBackup, DeviceProtection, StreamingTV, StreamingMovies**)
+    - The **higer** RiskScore, the **higer risk** to churn for each customer
+  + This dataset may be **insufficent** to track and evluate the KPI, a **time series** of customer behaviors may be better. More analysis need to be done to evluate the sensitivity and robustness of KPI(s).
+
+
+## Next Steps
+
+#### Build the model to predict Churn
+
+#### Proposal on what we can do

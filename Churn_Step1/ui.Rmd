@@ -1,0 +1,251 @@
+---
+title: "Finding1"
+output: html_document
+---
+```{r}
+
+library(shiny)
+library(shinydashboard)
+library(shinyWidgets)
+library(DT)
+library(ggplot2)
+library(plotly)
+library(data.table)
+library(forecast)
+library(zoo)
+library(tidyverse)
+library(tseries)
+library(lubridate)
+library(anytime)
+library(gridExtra)
+library(prophet)
+library(flipPlots)
+library(GGally)
+library(networkD3)
+
+churn = fread("./WA_Fn-UseC_-Telco-Customer-Churn.csv")
+cat = fread("./cat.csv")
+num = fread("./num.csv")
+
+# Define UI for application 
+ui <- dashboardPage(
+  dashboardHeader(title = "Step1 Understand the Dataset",
+                  titleWidth = 450),
+  
+  dashboardSidebar(sidebarMenu(
+    menuItem("Data Summary", tabName = "dashboard1", icon = icon("dashboard")),
+    menuItem("Categorical Variables", tabName = "dashboard2", icon = icon("th")),
+    menuItem("Numerical Variables", tabName = "dashboard3", icon = icon("th")),
+    menuItem("Feature Engineer", tabName = "dashboard4", icon = icon("th")),
+    menuItem("Conclusion", tabName = 'dashboard5', icon = icon("th")),
+    menuItem('R code', tabName = 'dashboard6', icon = icon("th"))
+   )
+  #,
+  # dateRangeInput("daterange1", "Date range:",
+  #                start = "2016-05-01",
+  #                end   = "2018-06-30")
+  
+  ),
+  dashboardBody(
+    tabItems(
+      tabItem(tabName = 'dashboard1',
+              fluidRow(tweaks,
+                       column(width = 12,
+                box(width = 12,height = 350,
+                    title = "Project Summary", status = "success", solidHeader = TRUE,
+                    includeMarkdown("finding1.Rmd")
+                    
+                ))
+                
+              ),
+              fluidRow(tweaks,
+                       column(width = 4,
+                              box(width = 12,height = 400,
+                                  title = "Categorical Variables Summary", status = "primary", solidHeader = TRUE,
+                                  DTOutput('tb1')
+                                  )
+                                  
+                              ),
+                       column(width = 5,
+                              box(width = 12,height = 400,
+                                  title = "Numerical Variables Summary", status = "primary", solidHeader = TRUE,
+                                  DTOutput('tb2'),
+                                  textOutput("text1")
+                                  
+                              )
+                              
+                       ),
+                       column(width = 3,
+                              box(width = 12, height = 400,
+                                  title = 'Churn Distribution Overall', status = 'warning', solidHeader = TRUE,
+                                  plotlyOutput('plot1', height = 325),
+                                  textOutput("text2")
+                                  )
+                              )
+              ),
+              fluidRow(
+                column(width = 12,
+                       box(width = 12,height = 380,
+                           title = "Head of Dataset", status = "primary", solidHeader = TRUE,
+                           DTOutput('tb3')
+                          )
+                       ))
+
+      ),
+      tabItem(tabName = 'dashboard2',
+              fluidRow(tweaks,
+                       column(width = 7,
+                              box(width = 12,height = 615,
+                                  title = "Bar Plot within Category by Churn", status = "primary", solidHeader = TRUE,
+                                  plotOutput('plot2')
+                              )
+                              
+                       ),
+                       column(width = 5,
+                              box(width = 12,height = 250,
+                                  title = "Select the Categorical Variables", status = "primary", solidHeader = TRUE,
+                                  tags$div(align = 'left', 
+                                           class = 'multicol', 
+                                           radioButtons("category_input1","Check Below:",category_choices, selected = category_selected))
+                                  
+                                  
+                              ),
+                              box(width = 12, height = 345,
+                                  title = "Table View",status = "primary", solidHeader = TRUE,
+                                  DTOutput('tb4')
+                                  )
+                              
+                       )
+              ),
+              fluidRow(tweaks,
+                       column(width = 12,
+                       box(width = 12,height = 250,
+                           title = "Summary", status = "success", solidHeader = TRUE,
+                           includeMarkdown("finding2.Rmd")
+                           
+                       ))
+                       
+              )              
+              
+              
+      ),
+      
+      tabItem(tabName = 'dashboard3',
+              fluidRow(tweaks,
+                       column(width = 7,
+                              box(width = 12,height = 615,
+                                  title = "Box Plot within Numerical Vars by Churn", status = "primary", solidHeader = TRUE,
+                                  plotOutput('plot3')
+                              )
+                              
+                       ),
+                       column(width = 5,
+                              box(width = 12,height = 180,
+                                  title = "Select the Numerical Variables", status = "primary", solidHeader = TRUE,
+                                  tags$div(align = 'left', 
+                                           class = 'multicol', 
+                                           radioButtons("num_input1","Check Below:",num_choices, selected = num_selected))
+                                  
+                                  
+                              ),
+                              box(width = 12, height = 415,
+                                  title = "Histogram by Churn",status = "warning", solidHeader = TRUE,
+                                  plotOutput('plot4')
+                              )
+                              
+                       )
+              ),
+              fluidRow(tweaks,
+                       column(width = 12,
+                       box(width = 12,height = 300,
+                           title = "Summary", status = "success", solidHeader = TRUE,
+                           includeMarkdown("finding3.Rmd")
+                           
+                       )
+                       )
+                       
+              )              
+              ),
+      tabItem(tabName = 'dashboard4',
+              fluidRow(#tweaks,
+                       column(width = 5,
+                              box(width = 12,height = 315,
+                                  title = "Convert Numerical into Categorical", status = "primary", solidHeader = TRUE,
+                                  includeMarkdown("finding4.Rmd")
+                                  
+                                  
+                              ),
+                              box(width = 6,
+                                  title = "Sankey first layer", status = "warning", solidHeader = TRUE,
+                                  #tags$div(align = 'left', 
+                                         #class = 'multicol',
+                                         radioButtons("layer_1","Check below:",layer1_choices, selected = layer1_selected)#)
+                              ),
+                              box(width = 6,
+                                  title = "Sankey second layer", status = "warning", solidHeader = TRUE,
+                                  #tags$div(align = 'left', 
+                                         #class = 'multicol',
+                                         radioButtons("layer_2","Check below:",layer2_choices, selected = layer2_selected)#)
+                              )
+                              
+                       ),
+                       column(width = 7,
+                              box(width = 12,height = 615,
+                                  title = "Sankey Flow by cluster", status = "warning", solidHeader = TRUE,
+                                  sankeyNetworkOutput("plot_5")
+                                  
+                              )
+                              
+                       )
+              ),
+              fluidRow(tweaks,
+                       column(width = 5,
+                              box(width = 12, height = 665,
+                                  title = "Correlation Analysis", status = "success", solidHeader = TRUE,
+                                  includeMarkdown('finding5.Rmd')
+                                  )
+                              ),
+                       column(width = 7,
+                              box(width = 12, height = 665,
+                                  title = "Correlation Plot with Converted Numeric", status = "success", solidHeader = TRUE,
+                                  plotOutput("plot_6", height = 600)
+                                  )
+                       
+                              )
+                       )
+              
+      ),
+      tabItem(tabName = 'dashboard5',
+              fluidRow(tweaks,
+                       column(width = 12,
+                              box(width = 12, height = 860,
+                                  title = "Conclusions", status = "success", solidHeader = TRUE,
+                                  includeMarkdown("finding6.Rmd")
+                                  )
+                              )
+                       
+                       )
+              ),
+      tabItem(tabName = 'dashboard6',
+              fluidRow(tweaks,
+                       column(width = 12,
+                              tabBox(width = 12,
+                                     title = 'R code for the dashboard',
+                                     
+                                     side = 'right', selected = 'app',
+                                     tabPanel('app', "UI.R", includeMarkdown("ui.Rmd")),
+                                     tabPanel('server', "Server.R", includeMarkdown("server.Rmd")),
+                                     tabPanel('helper', "Helper_function.R", includeMarkdown("helper_function.Rmd"))
+                              )
+                       )
+                       
+              )
+      )    
+    )
+  )
+  
+  )
+
+
+```
+

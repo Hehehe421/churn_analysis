@@ -1,0 +1,12 @@
+name: Churn_Step1
+title: Churn_Step1
+username:
+account: hehehe
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1880121
+bundleId: 2838040
+url: https://hehehe.shinyapps.io/Churn_Step1/
+when: 1582916763.36628
+asMultiple: FALSE
+asStatic: FALSE

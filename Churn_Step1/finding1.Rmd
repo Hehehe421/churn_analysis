@@ -1,0 +1,14 @@
+
+This is a project focus on customer churn. Churn is important because it directly affects service's profitability. Churn analysis is the evaluation of a company’s customer loss rate in order to reduce it. Also referred to as customer attrition rate, churn can be minimized by assessing your product and how people use it. The dataset for this project can be find at <https://www.kaggle.com/blastchar/telco-customer-churn>. 
+
+### DataSet Summary(Telcom Customer Churn)
+
+- Each row represents a customer, each column contains customer’s attributes described on the column Metadata.
+
+- The raw data contains **7043** rows (customers) and **21** columns (features).
+
+- The “Churn” column is our target. Except the target(Churn) and ID column(customerID), we have **16** categorical variables and **3** numerical variables.
+
+### Objective in this Section
+-  Try and look for public data sets around that and start to break it down into clusters and build understanding of factors that drive retention/engagement or churn
+

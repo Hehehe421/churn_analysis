@@ -1,0 +1,124 @@
+---
+title: "Finding1"
+output: html_document
+---
+```{r}
+server <- function(input, output) {
+  
+  my_tb4 <- reactive({
+    df = churn[,{
+      count = .N
+      .SD[,.(Count = .N,Percentage=paste0(round(.N/count*100,1),"%")),by=eval(input$category_input1)]
+    },by=Churn]
+    df
+  }) 
+  
+  my_data <- reactive({
+    df = churn[, .(Count = .N), by = eval(c(input$layer_1,input$layer_2, 'Churn'))]
+    df
+  })
+  
+  
+  output$plot1 = renderPlotly(
+    churn %>%
+      group_by(Churn) %>%
+      dplyr::summarize(count=n()) %>%
+      plot_ly(labels = ~Churn, values = ~count, marker = list(colors = c("deepskyblue", "tomato"))) %>%
+      add_pie(hole = 0.5) %>%
+      layout(showlegend = T,
+             #title = 'Customer Churn Distribution',
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  )
+  
+
+  output$tb1 = DT::renderDataTable(
+    cat[, c(1,3,4,6)],
+    rownames = FALSE,
+    options = list(autoWidth = TRUE,searching = FALSE, paging = FALSE)
+  )
+    
+  output$tb2 = DT::renderDataTable(
+    num,
+    rownames = FALSE,
+    options = list(autoWidth = TRUE,searching = FALSE, paging = FALSE)
+  )
+  
+  output$tb3 = DT::renderDataTable(
+    head(churn,5),
+    rownames = FALSE,
+    options = list(autoWidth = TRUE,searching = FALSE, paging = FALSE, scrollX = TRUE)
+  )
+  
+  output$plot2 = renderPlot(height = 500,
+    plot_groupbar(churn, "Churn", c(input$category_input1), 100, 
+                  "", 
+                  c(input$category_input1))
+  )
+  output$plot3 = renderPlot(height = 500,
+    plot_groupbox(churn, "Churn", input$num_input1, 
+                  "",
+                  "")
+  )
+  
+  output$plot4 = renderPlot(height = 360,
+    plot_grouphist(churn,input$num_input1, '', '')
+                            
+  )
+  
+  output$tb4 = DT::renderDataTable(
+    my_tb4(),
+    rownames = FALSE,
+    options = list(autoWidth = TRUE,searching = FALSE, paging = FALSE)
+  )
+  
+  output$plot_5 = renderSankeyNetwork({
+    my.data = my_data()
+     SankeyDiagram(my.data[, -4],
+                   link.color = "Source", 
+                   label.show.varname = FALSE,
+                   weights = my.data$Count) 
+                            } )
+  
+  output$plot_6 = renderPlot({
+    p.mat <- cor.mtest(churn_num[, c(-1, -24, -23, -22)])
+    #head(p.mat[, 1:5])
+    col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+    corrplot(M, method="color", col=col(200),  
+             type="upper", 
+             order="hclust", 
+             addCoef.col = "black", # Add coefficient of correlation
+             number.cex=0.75,
+             tl.col="black", tl.srt=45, #Text label color and rotation
+             # Combine with significance
+             p.mat = p.mat, sig.level = 0.01, insig = "blank", 
+             # hide correlation coefficient on the principal diagonal
+             diag=FALSE 
+    )
+    
+  })
+  output$text1 <- renderText({
+    HTML(
+    paste(
+          "There are 11 missing values in TotalCharges, we will remove these customer in future analysis."
+          )
+    )
+  })
+  
+  output$text2 <- renderText({
+    HTML(
+      paste(
+        "The ratio of (Target = 'No')/(Target = 'Yes') is 2.7."
+      )
+    )
+  })  
+  
+  
+  
+}
+
+shinyApp(ui, server)
+
+
+```
+

@@ -1,0 +1,13 @@
+---
+title: "Finding2"
+output: html_document
+---
+### Findings: 
+- Among all the categorical feature, gender, Partner, Dependents, Phone Service, Multiple Lines seems don't have much difference between Churned and Non-Churned customer.
+- **Month-to-Month** contract customer has a higer risk to Churn
+- Internet Service with **Fiber optic** customer have a more tendency to Churn
+- Payment Method with **Electronic check** is more tendency to Churn
+- **No Internet Service** in OnlineSecurity/Backup/DevicePRotection/TechSupport/StreatingTV/StreamingMovies are more less to Churn
+
+In general, those **"Modern"** cusotmer who has an active exposure to the Internet are more tendency to Churn than those who don't use Internet a lot. 
+

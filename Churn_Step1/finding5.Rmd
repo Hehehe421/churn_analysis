@@ -1,0 +1,31 @@
+
+### Convert Categorical Variables into Numerical variables: 
+- For categorical variables: **OnlineBackup**, **OnlineSecurity**, **DeviceProtection**, **DeviceProtection**, **TechSupport**, **StreamingTV**, **StreamingMovies**, converted as 
+  + **"Yes" = 1**,
+  + **"No" = 2**, 
+  + **"No internet service" = 3**.
+- For categorical variables: **Partner**, **Dependents**, **PhoneService**, **PaperlessBilling**, converted as 
+  + **"Yes" = 1**, 
+  + **"No" = 2**.
+- For categorical variable **MultipleLines** converted as 
+  + **"Yes" = 1**, 
+  + **"No" = 2**, 
+  + **"No phone service" = 2**.
+- For categorical variable **PaymentMethod** converted as 
+  + **"Electronic check" = 1**,
+  + **"Mailed check" = 2**,
+  + **"Bank transfer (automatic)" = 3**,
+  + **"Credit card (automatic)" = 4**.
+- For categorical varibale **gender** converted as 
+  + **"Female" = 1**, 
+  + **"Male" = 2**.
+- For categorical varibale **InternetService** converted as 
+  + **"DSL" = 1**, 
+  + **"Fiber optic" = 2**, 
+  + **"No" = 3**.
+- For target variable **Churn** converted as 
+  + **"Yes" = 1**, 
+  + **"No" = 0**.
+  
+
+
