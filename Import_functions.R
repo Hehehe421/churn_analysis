@@ -370,3 +370,8 @@ corrplot(M, method="color", col=col(200),
          # hide correlation coefficient on the principal diagonal
          diag=FALSE 
 )
+
+
+churn[, .(sum = sum(TotalCharges), count = .N), by = 'Contract']
+
+churn[, .(sum = sum(TotalCharges), count = .N, mean = mean(MonthlyCharges)), by = 'tenure_group']
